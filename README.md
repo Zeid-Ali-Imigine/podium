@@ -30,98 +30,114 @@ Une application web moderne et interactive conçue pour gérer des compétitions
 - **Chart.js / Recharts** : Pour la visualisation des données graphiques.
 - **Moteur de Style** : CSS Vanilla avec variables CSS pour une personnalisation facile (Thèmes).
 
-## ⚙️ Installation et Configuration
+## ⚙️ Installation et Démarrage Rapide
 
-Suivez ces étapes pour lancer le projet localement.
+Ce guide est optimisé pour un démarrage rapide sous **Windows**.
 
-### Prérequis
-- Python 3.8+
-- Node.js & npm
+### 1. Backend (API Django)
 
-### 1. Installation du Backend
+Ouvrez un terminal (PowerShell ou Command Prompt) et suivez ces instructions :
 
-Rendez-vous dans le dossier Backend :
-```bash
-cd Backend
-```
+1. **Accédez au dossier Backend** :
+   ```bash
+   cd Backend
+   ```
 
-Créez et activez un environnement virtuel :
-```bash
-# Windows
-python -m venv venv
-.\venv\Scripts\activate
+2. **Configuration Environnement & Dépendances** :
+   ```bash
+   # Création de l'environnement virtuel
+   python -m venv venv
+   
+   # Activation (Windows)
+   .\venv\Scripts\activate
+   
+   # Installation des dépendances
+   pip install -r requirements.txt
+   ```
 
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
+3. **Base de Données & Données Initiales** :
+   Préparez la base de données et chargez automatiquement les données de test (Utilisateurs, Équipes, Scores).
+   ```bash
+   # Migrations
+   python manage.py makemigrations
+   python manage.py migrate
+   
+   # Création automatique de l'admin (admin/admin123)
+   python manage.py shell < create_admin.py
+   
+   # Génération de données de démonstration
+   python manage.py shell < create_test_data.py
+   ```
 
-Installez les dépendances :
-```bash
-pip install -r requirements.txt
-```
+4. **Lancer le Serveur** :
+   ```bash
+   python manage.py runserver
+   ```
+   ✅ Le backend est actif sur `http://localhost:8000`.
 
-Appliquez les migrations de la base de données :
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
+### 2. Frontend (Interface React)
 
-Créez un compte administrateur :
-```bash
-python manage.py createsuperuser
-```
+Ouvrez un **nouveau** terminal (gardez le premier ouvert) :
 
-Lancez le serveur de développement :
-```bash
-python manage.py runserver
-```
- Le backend sera accessible sur `http://localhost:8000`.
+1. **Accédez au dossier Frontend** :
+   ```bash
+   cd Frontend
+   ```
 
-### 2. Installation du Frontend
+2. **Installation & Lancement** :
+   ```bash
+   # Installation des paquets
+   npm install
+   
+   # Lancement
+   npm start
+   ```
+   ✅ L'interface s'ouvrira automatiquement sur `http://localhost:3000`.
 
-Ouvrez un nouveau terminal et rendez-vous dans le dossier Frontend :
-```bash
-cd Frontend
-```
-
-Installez les dépendances Node :
-```bash
-npm install
-```
-
-Lancez l'application React :
-```bash
-npm start
-```
-L'application s'ouvrira sur `http://localhost:3000`.
+---
 
 ## 📱 Utilisation
 
-1. **Connexion** : Utilisez le compte superutilisateur créé pour vous connecter en tant qu'Admin.
-2. **Créer des Leaders** : Depuis l'interface Admin ou via l'inscription, créez des comptes utilisateurs. Assignez-leur le rôle "Leader" si nécessaire (via l'admin Django ou l'interface si implémentée).
-3. **Gérer les Équipes** : Créez des équipes et assignez des leaders.
-4. **Suivre les Scores** : Ajoutez des points aux équipes et observez le classement évoluer en direct.
+Une fois les deux serveurs lancés :
+
+1. **Accès Administrateur** : 
+   - Allez sur `http://localhost:3000/login`
+   - Connectez-vous avec : 
+     - **Email** : `admin@podium.com` / **Utilisateur** : `admin`
+     - **Mot de passe** : `admin123`
+
+2. **Fonctionnalités Disponibles** :
+   - **Tableau de Bord** : Vue d'ensemble des scores et classements.
+   - **Gestion** : Créez de nouvelles équipes ou leaders.
+   - **Simulation** : Les données de test vous permettent de voir immédiatement à quoi ressemble l'application remplie.
 
 ## 📂 Structure du Projet
 
 ```
 podium/
 ├── Backend/            # API Django
-│   ├── competition/    # App principale (Models, Views, Serializers)
-│   ├── podium_backend/ # Configuration du projet
+│   ├── competition/    # App principale
+│   ├── create_admin.py # Script auto-admin
+│   ├── create_test_data.py # Script données démo
 │   └── manage.py
 │
 ├── Frontend/           # App React
-│   ├── public/
-│   └── src/
-│       ├── components/ # Composants réutilisables (Layout, Charts...)
-│       ├── contexts/   # Gestion d'état (AuthContext)
-│       ├── pages/      # Pages principales (Dashboard, Login...)
-│       └── services/   # Appels API (axios)
+│   ├── src/
+│   │   ├── components/ # Composants UI
+│   │   ├── contexts/   # Auth & État
+│   │   └── pages/      # Vues principales
+│   └── package.json
 └── README.md
 ```
 
-## 🎨 Design
+## 🎨 Design & Technologies
 
-Le projet utilise un système de variables CSS pour faciliter la maintenance du thème graphique. Le thème par défaut est un mode sombre moderne utilisant des nuances de gris profond (`#030712`, `#111827`) et des accents vibrants (Indigo, Violet, Rose).
+- **Frontend** : React.js, Recharts, CSS Modules (Dark Mode, Glassmorphism).
+- **Backend** : Django REST Framework, SQLite.
+- **Style** : Palette de couleurs moderne (Indigo/Violet) optimisée pour le contraste et l'esthétique.
+
+## ❓ Dépannage
+
+- **Erreur "python introuvable"** : Assurez-vous d'avoir ajouté Python au PATH lors de l'installation, ou utilisez `py` au lieu de `python`.
+- **Erreur "npm"** : Installez Node.js depuis le site officiel.
+- **Scripts PowerShell bloqués** : Si l'activation du venv échoue, exécutez `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` dans PowerShell.

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  FiHome, FiUsers, FiAward, FiBarChart2, FiSettings, 
+import {
+  FiHome, FiUsers, FiAward, FiBarChart2, FiSettings,
   FiLogOut, FiMenu, FiX, FiBell, FiSearch, FiMoon, FiSun
 } from 'react-icons/fi';
 import './Layout.css';
@@ -49,7 +49,7 @@ const Layout = ({ children, role = 'admin' }) => {
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
           <h2>🏆 Podium</h2>
-          <button 
+          <button
             className="sidebar-toggle"
             onClick={() => setSidebarOpen(!sidebarOpen)}
             aria-label="Toggle sidebar"
@@ -69,7 +69,7 @@ const Layout = ({ children, role = 'admin' }) => {
                 aria-label={item.label}
               >
                 <Icon />
-                {sidebarOpen && <span>{item.label}</span>}
+                <span className="nav-label">{item.label}</span>
               </button>
             );
           })}
@@ -81,7 +81,7 @@ const Layout = ({ children, role = 'admin' }) => {
             aria-label="Toggle dark mode"
           >
             {darkMode ? <FiSun /> : <FiMoon />}
-            {sidebarOpen && <span>Mode {darkMode ? 'clair' : 'sombre'}</span>}
+            <span className="nav-label">Mode {darkMode ? 'clair' : 'sombre'}</span>
           </button>
           <button
             className="nav-item logout"
@@ -89,7 +89,7 @@ const Layout = ({ children, role = 'admin' }) => {
             aria-label="Déconnexion"
           >
             <FiLogOut />
-            {sidebarOpen && <span>Déconnexion</span>}
+            <span className="nav-label">Déconnexion</span>
           </button>
         </div>
       </aside>
@@ -104,16 +104,8 @@ const Layout = ({ children, role = 'admin' }) => {
             >
               <FiMenu />
             </button>
-            <div className="search-bar">
-              <FiSearch />
-              <input type="text" placeholder="Rechercher..." />
-            </div>
           </div>
           <div className="navbar-right">
-            <button className="notification-btn" aria-label="Notifications">
-              <FiBell />
-              <span className="badge">3</span>
-            </button>
             <div className="user-menu">
               <span className="username">{user?.username}</span>
               <span className="user-role">{user?.role}</span>

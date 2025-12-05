@@ -35,7 +35,7 @@ class Badge(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True)
-    leader = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='led_teams')
+    leader = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='led_team')
     badges = models.ManyToManyField(Badge, through='TeamBadge', related_name='teams')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

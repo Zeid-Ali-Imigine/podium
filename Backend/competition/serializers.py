@@ -58,36 +58,53 @@ class TeamSerializer(serializers.ModelSerializer):
     total_score = serializers.ReadOnlyField()
     score_count = serializers.ReadOnlyField()
     scores = ScoreSerializer(many=True, read_only=True)
-    leader_username = serializers.CharField(source='leader.username', read_only=True)
+    leader_username = serializers.SerializerMethodField()
     badges = TeamBadgeSerializer(source='teambadge_set', many=True, read_only=True)
     
     class Meta:
         model = Team
         fields = ['id', 'name', 'description', 'leader', 'leader_username', 'total_score', 'score_count', 'scores', 'badges', 'created_at', 'updated_at']
 
+    def get_leader_username(self, obj):
+        return obj.leader.username if obj.leader else None
+
 
 class TeamListSerializer(serializers.ModelSerializer):
-    total_score = serializers.ReadOnlyField()
-    leader_username = serializers.CharField(source='leader.username', read_only=True)
+    total_score = serializers.SerializerMethodField()
+    leader_username = serializers.SerializerMethodField()
     badges_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Team
         fields = ['id', 'name', 'description', 'leader', 'leader_username', 'total_score', 'badges_count', 'created_at', 'updated_at']
     
+    def get_total_score(self, obj):
+        # Return annotated value if available (from dashboard_stats), otherwise model property
+        return getattr(obj, 'total_score_annotated', obj.total_score)
+
     def get_badges_count(self, obj):
         return obj.teambadge_set.count()
 
+    def get_leader_username(self, obj):
+        return obj.leader.username if obj.leader else None
+
 
 class LeaderboardSerializer(serializers.ModelSerializer):
-    total_score = serializers.ReadOnlyField()
+    total_score = serializers.SerializerMethodField()
     rank = serializers.IntegerField(read_only=True)
-    leader_username = serializers.CharField(source='leader.username', read_only=True)
+    leader_username = serializers.SerializerMethodField()
     badges = TeamBadgeSerializer(source='teambadge_set', many=True, read_only=True)
     
     class Meta:
         model = Team
         fields = ['id', 'name', 'description', 'leader_username', 'total_score', 'rank', 'badges', 'created_at']
+
+    def get_total_score(self, obj):
+        # Prioritize annotated value, fallback to property
+        return getattr(obj, 'annotated_total_score', getattr(obj, 'total_score_annotated', obj.total_score))
+
+    def get_leader_username(self, obj):
+        return obj.leader.username if obj.leader else None
 
 
 class ChallengeSerializer(serializers.ModelSerializer):

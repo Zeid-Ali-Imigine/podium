@@ -65,7 +65,7 @@ const Leaderboard = () => {
                 </td>
                 <td className="team-name">{team.name}</td>
                 <td className="score-cell">{team.total_score || 0}</td>
-                <td>{new Date(team.created_at).toLocaleDateString('fr-FR')}</td>
+                <td className="creation-date">{new Date(team.created_at).toLocaleDateString('fr-FR')}</td>
               </tr>
             ))}
           </tbody>

@@ -1,19 +1,26 @@
 .leaderboard-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
 }
 
 .leaderboard-container h1 {
   text-align: center;
-  color: #333;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  font-size: 2.5em;
+  font-weight: 800;
+  background: var(--gradient-primary);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
 }
 
 .leaderboard-table {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: var(--bg-card-glass);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 
@@ -23,67 +30,81 @@
 }
 
 .leaderboard-table thead {
-  background-color: #4a90e2;
-  color: white;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .leaderboard-table th {
-  padding: 15px;
+  padding: 20px;
   text-align: left;
   font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
 }
 
 .leaderboard-table tbody tr {
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.2s;
-}
-
-.leaderboard-table tbody tr:hover {
-  background-color: #f5f5f5;
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s;
 }
 
 .leaderboard-table tbody tr:last-child {
   border-bottom: none;
 }
 
+.leaderboard-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .leaderboard-table td {
-  padding: 15px;
+  padding: 20px;
+  color: var(--text-primary);
 }
 
 .rank-cell {
   text-align: center;
-  font-weight: bold;
-  font-size: 1.2em;
+  width: 80px;
 }
 
 .medal {
   font-size: 1.5em;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
 .team-name {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  font-size: 1.1em;
+  color: var(--text-primary);
 }
 
 .score-cell {
-  font-weight: bold;
-  color: #4a90e2;
+  font-weight: 700;
+  color: var(--color-primary);
   font-size: 1.1em;
 }
 
-.loading, .error {
+.creation-date {
+  color: #60a5fa;
+  font-weight: 500;
+  font-size: 0.95em;
+}
+
+.loading,
+.error,
+.no-teams {
   text-align: center;
-  padding: 40px;
-  font-size: 1.2em;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  font-size: 1.1em;
+  background: var(--bg-card-glass);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
 }
 
 .error {
-  color: #d32f2f;
+  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--color-error);
 }
-
-.no-teams {
-  text-align: center;
-  padding: 40px;
-  color: #666;
-}
-

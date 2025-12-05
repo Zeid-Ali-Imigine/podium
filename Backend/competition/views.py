@@ -1,7 +1,8 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, serializers
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Sum, Count, Q
 from django.contrib.auth import authenticate
@@ -33,9 +34,11 @@ class TeamViewSet(viewsets.ModelViewSet):
         return TeamSerializer
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'leaderboard', 'stats', 'export']:
+        if self.action in ['list', 'retrieve', 'leaderboard', 'stats', 'export', 'my_teams']:
             return [IsAuthenticated()]
-        elif self.action in ['create', 'update', 'partial_update', 'destroy']:
+        elif self.action in ['create', 'update', 'partial_update']:
+            return [IsLeaderOrAdmin()]
+        elif self.action in ['destroy']:
             return [IsAdmin()]
         return super().get_permissions()
     
@@ -51,7 +54,15 @@ class TeamViewSet(viewsets.ModelViewSet):
         return queryset
     
     def perform_create(self, serializer):
-        team = serializer.save()
+        user = self.request.user
+        if not user.is_admin():
+            # Leader restricted to 1 team
+            if Team.objects.filter(leader=user).exists():
+                raise ValidationError({"detail": "Vous ne pouvez gérer qu'une seule équipe."})
+            team = serializer.save(leader=user)
+        else:
+            team = serializer.save()
+            
         ActivityLog.objects.create(
             action='team_created',
             user=self.request.user,
@@ -113,8 +124,8 @@ class TeamViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def leaderboard(self, request):
         teams = Team.objects.annotate(
-            total_score=Sum('scores__points')
-        ).order_by('-total_score', 'name')
+            annotated_total_score=Sum('scores__points')
+        ).order_by('-annotated_total_score', 'name')
         
         # Filtres
         limit = request.query_params.get('limit', None)
@@ -126,18 +137,14 @@ class TeamViewSet(viewsets.ModelViewSet):
         prev_score = None
         
         for team in teams:
-            current_score = team.total_score or 0
+            current_score = team.annotated_total_score or 0
             if prev_score is not None and current_score < prev_score:
                 rank = len(ranked_teams) + 1
-            ranked_teams.append({
-                'id': team.id,
-                'name': team.name,
-                'description': team.description,
-                'leader_username': team.leader.username if team.leader else None,
-                'total_score': current_score,
-                'rank': rank,
-                'created_at': team.created_at
-            })
+            
+            # Attach rank to the instance purely for serialization
+            team.rank = rank
+            ranked_teams.append(team)
+            
             prev_score = current_score
         
         serializer = LeaderboardSerializer(ranked_teams, many=True)
@@ -184,7 +191,7 @@ class TeamViewSet(viewsets.ModelViewSet):
         writer.writerow(['ID', 'Nom', 'Description', 'Leader', 'Score Total', 'Nombre de scores', 'Date de création'])
         
         teams = Team.objects.annotate(
-            total_score=Sum('scores__points'),
+            annotated_total_score=Sum('scores__points'),
             score_count=Count('scores')
         )
         
@@ -194,7 +201,7 @@ class TeamViewSet(viewsets.ModelViewSet):
                 team.name,
                 team.description,
                 team.leader.username if team.leader else '',
-                team.total_score or 0,
+                team.annotated_total_score or 0,
                 team.score_count,
                 team.created_at.strftime('%Y-%m-%d %H:%M:%S')
             ])
@@ -318,28 +325,33 @@ class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
 @permission_classes([IsAdmin])
 def dashboard_stats(request):
     """Statistiques globales pour le dashboard admin"""
-    total_teams = Team.objects.count()
-    total_scores = Score.objects.count()
-    total_points = Score.objects.aggregate(total=Sum('points'))['total'] or 0
-    avg_score = total_points / total_teams if total_teams > 0 else 0
-    
-    # Évolution des scores sur les 30 derniers jours
-    thirty_days_ago = timezone.now() - timedelta(days=30)
-    recent_scores = Score.objects.filter(created_at__gte=thirty_days_ago)
-    
-    # Top 5 équipes
-    top_teams = Team.objects.annotate(
-        total_score=Sum('scores__points')
-    ).order_by('-total_score')[:5]
-    
-    return Response({
-        'total_teams': total_teams,
-        'total_scores': total_scores,
-        'total_points': total_points,
-        'avg_score': round(avg_score, 2),
-        'recent_scores_count': recent_scores.count(),
-        'top_teams': TeamListSerializer(top_teams, many=True).data
-    })
+    try:
+        total_teams = Team.objects.count()
+        total_scores = Score.objects.count()
+        total_points = Score.objects.aggregate(total=Sum('points'))['total'] or 0
+        avg_score = total_points / total_teams if total_teams > 0 else 0
+        
+        # Évolution des scores sur les 30 derniers jours
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        recent_scores = Score.objects.filter(created_at__gte=thirty_days_ago)
+        
+        # Top 5 équipes
+        top_teams = Team.objects.annotate(
+            total_score_annotated=Sum('scores__points')
+        ).order_by('-total_score_annotated')[:5]
+        
+        return Response({
+            'total_teams': total_teams,
+            'total_scores': total_scores,
+            'total_points': total_points,
+            'avg_score': round(avg_score, 2),
+            'recent_scores_count': recent_scores.count(),
+            'top_teams': TeamListSerializer(top_teams, many=True).data
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return Response({'error': str(e), 'trace': traceback.format_exc()}, status=500)
 
 
 @api_view(['POST'])

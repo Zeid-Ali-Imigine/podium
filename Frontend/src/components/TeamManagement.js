@@ -18,6 +18,8 @@ const TeamManagement = () => {
 
   const canAddTeam = user?.role === 'admin' || (user?.role === 'leader' && teams.length < 1);
   const canDeleteTeam = user?.role === 'admin';
+  const canEditTeam = user?.role === 'admin';
+  const canAddScore = user?.role === 'admin';
 
   const fetchTeams = async () => {
     try {
@@ -186,14 +188,16 @@ const TeamManagement = () => {
             <div className="team-header">
               <h3>{team.name}</h3>
               <div className="team-actions">
-                <button
-                  onClick={() => handleEdit(team)}
-                  className="btn-icon btn-icon-edit"
-                  aria-label={`Modifier ${team.name}`}
-                  title="Modifier"
-                >
-                  <FiEdit />
-                </button>
+                {canEditTeam && (
+                  <button
+                    onClick={() => handleEdit(team)}
+                    className="btn-icon btn-icon-edit"
+                    aria-label={`Modifier ${team.name}`}
+                    title="Modifier"
+                  >
+                    <FiEdit />
+                  </button>
+                )}
                 {canDeleteTeam && (
                   <button
                     onClick={() => setDeleteConfirm(team)}
@@ -213,15 +217,18 @@ const TeamManagement = () => {
             <div className="team-score">
               <strong>Score total: {team.total_score || 0}</strong>
             </div>
-            <button
-              onClick={() => {
-                setScoreData({ points: '', description: '' });
-                setShowScoreForm(team.id);
-              }}
-              className="btn btn-secondary"
-            >
-              + Ajouter des points
-            </button>
+
+            {canAddScore && (
+              <button
+                onClick={() => {
+                  setScoreData({ points: '', description: '' });
+                  setShowScoreForm(team.id);
+                }}
+                className="btn btn-secondary"
+              >
+                + Ajouter des points
+              </button>
+            )}
           </div>
         ))}
       </div>

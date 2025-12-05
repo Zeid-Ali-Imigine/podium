@@ -73,10 +73,11 @@ class TeamListSerializer(serializers.ModelSerializer):
     total_score = serializers.SerializerMethodField()
     leader_username = serializers.SerializerMethodField()
     badges_count = serializers.SerializerMethodField()
+    progress = serializers.SerializerMethodField()
     
     class Meta:
         model = Team
-        fields = ['id', 'name', 'description', 'leader', 'leader_username', 'total_score', 'badges_count', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'leader', 'leader_username', 'total_score', 'badges_count', 'progress', 'created_at', 'updated_at']
     
     def get_total_score(self, obj):
         # Return annotated value if available (from dashboard_stats), otherwise model property
@@ -87,6 +88,13 @@ class TeamListSerializer(serializers.ModelSerializer):
 
     def get_leader_username(self, obj):
         return obj.leader.username if obj.leader else None
+        
+    def get_progress(self, obj):
+        total = Challenge.objects.filter(is_active=True).count()
+        if total == 0:
+            return 0
+        completed = obj.challenge_progresses.filter(is_completed=True, challenge__is_active=True).count()
+        return round((completed / total) * 100)
 
 
 class LeaderboardSerializer(serializers.ModelSerializer):

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dashboardService, teamService, activityLogService } from '../../services/api';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { FiUsers, FiAward, FiTrendingUp, FiActivity } from 'react-icons/fi';
+import { FiUsers, FiAward, FiTrendingUp, FiActivity, FiUserPlus, FiEdit2, FiTrash2, FiPlusCircle } from 'react-icons/fi';
 import './DashboardPage.css';
 
 const COLORS = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
@@ -82,17 +82,17 @@ const DashboardPage = () => {
   const getActivityIcon = (action) => {
     switch (action) {
       case 'team_created':
-        return '👥';
+        return <FiUserPlus />;
       case 'team_updated':
-        return '✏️';
+        return <FiEdit2 />;
       case 'team_deleted':
-        return '🗑️';
+        return <FiTrash2 />;
       case 'score_added':
-        return '📊';
+        return <FiPlusCircle />;
       case 'badge_earned':
-        return '🏆';
+        return <FiAward />;
       default:
-        return '📌';
+        return <FiActivity />;
     }
   };
 

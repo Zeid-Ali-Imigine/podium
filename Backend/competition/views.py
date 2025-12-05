@@ -311,7 +311,7 @@ class ChallengeProgressViewSet(viewsets.ModelViewSet):
 class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ActivityLog.objects.all()
     serializer_class = ActivityLogSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         queryset = ActivityLog.objects.all()
@@ -322,7 +322,7 @@ class ActivityLogViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 @api_view(['GET'])
-@permission_classes([IsAdmin])
+@permission_classes([IsAuthenticated])
 def dashboard_stats(request):
     """Statistiques globales pour le dashboard admin"""
     try:

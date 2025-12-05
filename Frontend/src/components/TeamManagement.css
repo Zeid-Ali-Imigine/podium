@@ -440,3 +440,32 @@
   color: #fca5a5;
   border-left-color: var(--color-error);
 }
+
+/* Progress Bar */
+.team-progress {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--gradient-success);
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+}

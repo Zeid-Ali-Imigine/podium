@@ -37,10 +37,9 @@ const Layout = ({ children, role = 'admin' }) => {
     { icon: FiUsers, label: 'Équipes', path: '/admin/teams' },
     { icon: FiAward, label: 'Classement', path: '/admin/leaderboard' },
     { icon: FiBarChart2, label: 'Statistiques', path: '/admin/stats' },
-    { icon: FiSettings, label: 'Paramètres', path: '/admin/settings' },
   ] : [
     { icon: FiHome, label: 'Dashboard', path: '/leader/dashboard' },
-    { icon: FiUsers, label: 'Mes équipes', path: '/leader/teams' },
+    { icon: FiUsers, label: 'Les équipes', path: '/leader/teams' },
     { icon: FiAward, label: 'Classement', path: '/leader/leaderboard' },
   ];
 
